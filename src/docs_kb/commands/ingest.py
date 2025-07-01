@@ -22,6 +22,14 @@ def ingest(
     branch: Annotated[
         str, typer.Option("--branch", "-b", help="Branch to ingest from")
     ] = "main",
+    mindsdb_github_client: Annotated[
+        bool,
+        typer.Option(
+            "--mindsdb-github-client",
+            "-m",
+            help="Create Github Client for this repo in MindsDB server",
+        ),
+    ] = False,
 ):
     """
     Ingest files from a GitHub repository.
@@ -125,6 +133,18 @@ def ingest(
             f"✅ Successfully ingested {len(files)} files from repository {repo_name} on branch {branch}.",
             style="green bold",
         )
+
+        if mindsdb_github_client:
+            # Create GitHub client on MindsDB
+            console.print(
+                "🔗 Creating GitHub client on MindsDB for this repository...",
+                style="blue",
+            )
+            mindsdb_client.create_github_client_on_mindsdb(repo_name, branch)
+            console.print(
+                "✅ GitHub client created successfully on MindsDB.",
+                style="green",
+            )
 
         # Display success summary
         display_success_summary(repo_name, branch, len(files))

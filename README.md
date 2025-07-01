@@ -1,6 +1,6 @@
 # 📚 docs-kb
 
-AI-powered documentation knowledge base for GitHub repositories using MindsDB and local LLMs.
+AI-powered documentation knowledge base for GitHub repositories using MindsDB and local LLMs with MCP (Model Context Protocol) server support.
 
 ## 🌟 Features
 
@@ -10,6 +10,8 @@ AI-powered documentation knowledge base for GitHub repositories using MindsDB an
 - 🔄 **Smart Sync**: Efficiently syncs repository changes by comparing file SHAs
 - 📊 **Repository Management**: Track multiple repositories with detailed metadata
 - 🗃️ **Local Database**: SQLite-based storage for repository metadata and file tracking
+- 🌐 **MCP Server**: Model Context Protocol server for integration with AI assistants like Claude Desktop
+- 🔧 **GitHub Integration**: Create GitHub clients directly in MindsDB for enhanced repository access
 
 ## 🛠️ Prerequisites
 
@@ -60,6 +62,9 @@ docs-kb ingest owner/repository-name
 
 # Ingest from a specific branch
 docs-kb ingest owner/repository-name --branch develop
+
+# Create GitHub client in MindsDB during ingestion
+docs-kb ingest owner/repository-name --mindsdb-github-client
 ```
 
 ### 2. Query Your Documentation
@@ -80,6 +85,15 @@ docs-kb list
 docs-kb manage
 ```
 
+### 5. Start MCP Server
+```bash
+# Start MCP server for AI assistant integration
+docs-kb start-mcp-server
+
+# Start on custom host and port
+docs-kb start-mcp-server --host 0.0.0.0 --port 8080
+```
+
 ## 📖 Detailed Commands
 
 ### `docs-kb ingest`
@@ -92,8 +106,9 @@ Arguments:
   REPO_NAME  GitHub repository name (e.g., 'owner/repo')  [required]
 
 Options:
-  -b, --branch TEXT  Branch to ingest from  [default: main]
-  --help            Show this message and exit
+  -b, --branch TEXT                Branch to ingest from  [default: main]
+  -m, --mindsdb-github-client     Create GitHub client in MindsDB server
+  --help                          Show this message and exit
 ```
 
 **Examples:**
@@ -103,6 +118,9 @@ docs-kb ingest microsoft/vscode
 
 # Ingest from specific branch
 docs-kb ingest facebook/react --branch canary
+
+# Ingest with GitHub client creation in MindsDB
+docs-kb ingest microsoft/vscode --mindsdb-github-client
 
 # Ingest with GitHub token for private repos
 GITHUB_TOKEN=your_token docs-kb ingest private-org/private-repo
@@ -163,6 +181,30 @@ Options:
 - **🔄 Sync**: Update repository with latest changes from GitHub
 - **🗑️ Delete**: Remove repository and its knowledge base permanently
 
+### `docs-kb start-mcp-server`
+Start the Model Context Protocol (MCP) server for AI assistant integration.
+
+```bash
+docs-kb start-mcp-server [OPTIONS]
+
+Options:
+  -h, --host TEXT     Host to bind to  [default: localhost]
+  -p, --port INTEGER  Port to bind to  [default: 8000]
+  --help             Show this message and exit
+```
+
+**Examples:**
+```bash
+# Start server on default localhost:8000
+docs-kb start-mcp-server
+
+# Start server on custom host and port
+docs-kb start-mcp-server --host 0.0.0.0 --port 8080
+
+# Start server accessible from other machines
+docs-kb start-mcp-server --host 0.0.0.0
+```
+
 ### `docs-kb version`
 Show version and project information.
 
@@ -172,6 +214,95 @@ docs-kb version [OPTIONS]
 Options:
   --help  Show this message and exit
 ```
+
+## 🌐 MCP Server Integration
+
+The docs-kb MCP server provides AI assistants like Claude Desktop with powerful tools to interact with your documentation knowledge base and GitHub repositories.
+
+### Available MCP Tools
+
+#### 1. `how_to_use_docs_kb_mcp()`
+Get comprehensive usage guide for the MCP server.
+
+#### 2. `list_available_repositories()`
+List all ingested repositories in the knowledge base.
+
+**Returns:**
+- Repository ID, name, branch
+- Knowledge base name
+- Creation and ingestion timestamps
+- File count
+
+#### 3. `query_repository_docs(repo_name, branch, query, limit=10)`
+Query a repository's knowledge base with natural language.
+
+**Parameters:**
+- `repo_name`: Repository name (e.g., 'owner/repo')
+- `branch`: Repository branch
+- `query`: Natural language search query
+- `limit`: Maximum results to return
+
+**Returns:**
+- Search results with content and metadata
+- Relevance scores and source information
+- Total results count
+
+#### 4. `get_repository_tree(repo_name, branch, file_extensions, path_filter)`
+Browse GitHub repository file structure with filtering.
+
+**Parameters:**
+- `repo_name`: Repository name
+- `branch`: Repository branch (default: 'main')
+- `file_extensions`: File types to include (e.g., ['.md', '.py'])
+- `path_filter`: Path prefix filter (e.g., 'docs/')
+
+**Returns:**
+- Filtered list of files
+- Total file count
+- Applied filters summary
+
+#### 5. `get_single_file(repo_name, file_path, branch='main')`
+Retrieve content of a specific file from GitHub.
+
+**Parameters:**
+- `repo_name`: Repository name
+- `file_path`: Path to the file
+- `branch`: Repository branch
+
+**Returns:**
+- File content and metadata
+- File information (size, SHA, etc.)
+- Encoding details
+
+#### 6. `load_multiple_files(repo_name, file_paths, branch='main', max_concurrent=10)`
+Load multiple files from GitHub repository concurrently.
+
+**Parameters:**
+- `repo_name`: Repository name
+- `file_paths`: List of file paths to load
+- `branch`: Repository branch
+- `max_concurrent`: Maximum concurrent requests
+
+**Returns:**
+- Successfully loaded files
+- Failed file paths
+- Loading statistics
+
+### MCP Server Setup
+
+1. **Start the MCP Server:**
+   ```bash
+   docs-kb start-mcp-server
+   ```
+
+2. **Configure MCP Client** 
+    - Use the MCP client in your AI assistant
+    - Connect to the server at `http://localhost:8000` (or custom host/port)
+
+3. **Use with AI Assistants:**
+   - The server provides tools for querying ingested documentation
+   - Browse and access any GitHub repository files
+   - Perform natural language searches across documentation
 
 ## 🔄 Sync Process
 
@@ -203,6 +334,11 @@ The sync command intelligently compares your local knowledge base with the lates
 - **Reranking**: Ollama gemma2 model
 - **Content**: Document chunks with metadata (repository, branch, path, SHA, etc.)
 
+### GitHub Integration
+- **MindsDB GitHub Clients**: Optional GitHub database connections in MindsDB
+- **Purpose**: Enhanced repository access and integration
+- **Creation**: Use `--mindsdb-github-client` flag during ingestion
+
 ## 🏗️ Architecture
 
 ### Core Components
@@ -219,6 +355,13 @@ The sync command intelligently compares your local knowledge base with the lates
 - **[`src/docs_kb/commands/sync.py`](src/docs_kb/commands/sync.py)**: Smart synchronization
 - **[`src/docs_kb/commands/manage.py`](src/docs_kb/commands/manage.py)**: Repository management
 - **[`src/docs_kb/commands/list.py`](src/docs_kb/commands/list.py)**: Repository listing
+- **[`src/docs_kb/commands/start_mcp.py`](src/docs_kb/commands/start_mcp.py)**: MCP server startup
+
+### MCP Server
+
+- **[`src/docs_kb/mcp_server/server.py`](src/docs_kb/mcp_server/server.py)**: FastMCP server implementation
+- **Protocol**: Model Context Protocol for AI assistant integration
+- **Tools**: 6 comprehensive tools for documentation and repository access
 
 ## 🔧 Configuration
 
@@ -228,6 +371,7 @@ The sync command intelligently compares your local knowledge base with the lates
 # GitHub token for private repositories or higher rate limits
 export GITHUB_TOKEN=your_github_personal_access_token
 ```
+
 ### Ollama Configuration
 
 Ensure these models are available:
@@ -238,47 +382,22 @@ ollama list
 # gemma2:latest
 ```
 
-## 🚨 Troubleshooting
+### MindsDB GitHub Client
 
-### Common Issues
+When using the `--mindsdb-github-client` flag, docs-kb creates a GitHub database connection in MindsDB:
 
-**1. Ollama Connection Error**
-```bash
-# Check if Ollama is running
-curl http://localhost:11434/api/tags
-
-# Start Ollama if not running
-ollama serve
+```sql
+CREATE DATABASE github_client
+WITH ENGINE = 'github'
+PARAMETERS = {
+    repository = 'owner/repo',
+    branch = 'main',
+    "api_key": 'your_github_token'
+};
 ```
 
-**2. MindsDB Connection Error**
-- Ensure MindsDB is running and accessible
-- Check connection credentials if using MindsDB Cloud
+This enables MindsDB MCP for advance repository analysis and querying when combined with docs-kb-mcp.
 
-**3. GitHub Rate Limits**
-```bash
-# Set GitHub token to increase rate limits
-export GITHUB_TOKEN=your_token
-```
-
-**4. No Files Found**
-- Repository might not contain .md or .mdx files
-- Check if branch exists and has documentation
-
-**5. Permission Errors**
-```bash
-# Ensure write permissions for database directory
-chmod 755 ~/.docs-kb/
-```
-
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
 
 ## 📋 Requirements
 
@@ -286,6 +405,7 @@ chmod 755 ~/.docs-kb/
 - Ollama with nomic-embed-text and gemma2 models
 - MindsDB (local or cloud)
 - Optional: GitHub Personal Access Token
+- For MCP: Compatible AI assistant (Claude Desktop, etc.)
 
 ## 📄 License
 
@@ -300,4 +420,4 @@ For issues and questions:
 
 ---
 
-Built with ❤️ using MindsDB, Ollama, and Python
+Built with ❤️ using MindsDB, Ollama, FastMCP, and Python

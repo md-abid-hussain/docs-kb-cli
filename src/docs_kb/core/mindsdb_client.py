@@ -1,3 +1,5 @@
+import os
+
 from textwrap import dedent
 from typing import Dict, List
 
@@ -94,6 +96,30 @@ class MindsDBClient:
             print(f"Knowledge base '{kb_name}' deleted successfully.")
         except Exception as e:
             print(f"Error deleting knowledge base '{kb_name}': {e}")
+
+    def create_github_client_on_mindsdb(
+        self,
+        repo_name: str,
+        branch: str,
+    ):
+        """
+        Create a GitHub client on MindsDB for the specified repository and branch.
+        """
+        try:
+            github_client_sql = dedent(
+                f"""
+            CREATE DATABASE IF NOT EXISTS {repo_name.replace('/', '_').replace('-', '_')}_{branch}_github_client
+            WITH ENGINE = "github"
+            PARAMETERS = {{
+                "repository" : "{repo_name}",
+                "branch" : "{branch}",
+                "api_key" : "{os.getenv("GITHUB_TOKEN")}"
+            }};
+            """
+            )
+            self.client.query(github_client_sql).fetch()
+        except Exception as e:
+            print(f"Error creating GitHub client: {e}")
 
 
 mindsdb_client = MindsDBClient()
