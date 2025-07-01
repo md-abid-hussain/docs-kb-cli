@@ -1,0 +1,18 @@
+[project]
+name = "docs-kb"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "github-file-loader>=0.2.0",
+    "mindsdb-sdk>=3.4.4",
+    "sqlmodel>=0.0.24",
+    "typer>=0.16.0",
+]
+[project.scripts]
+docs-kb = "docs_kb.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
