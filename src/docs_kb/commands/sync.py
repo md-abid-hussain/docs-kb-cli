@@ -1,4 +1,3 @@
-import os
 from typing import Dict, List, Optional
 
 import click
@@ -12,6 +11,7 @@ from rich.table import Table
 from ..core.file_loader import FileLoader
 from ..core.mindsdb_client import mindsdb_client
 from ..core.models import Repository, list_repositories
+from ..utils import get_or_request_github_token
 
 app = typer.Typer()
 console = Console()
@@ -108,11 +108,12 @@ def sync_repository(repository: Repository):
     )
 
     try:
+        github_token = get_or_request_github_token()
         # Initialize file loader
         file_loader = FileLoader(
             repo_name=repository.name,
             branch=repository.branch,
-            github_token=os.getenv("GITHUB_TOKEN"),
+            github_token=github_token,
         )
 
         # Discover current files on GitHub

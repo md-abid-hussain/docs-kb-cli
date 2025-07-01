@@ -4,8 +4,11 @@ from typing import Dict, List
 import requests
 from mindsdb_sdk import connect
 from pandas import DataFrame
+from rich.console import Console
 
 from .models import add_repository, create_db_and_tables
+
+console = Console()
 
 
 class MindsDBClient:
@@ -17,10 +20,14 @@ class MindsDBClient:
 
     def ingest(self, repo_name: str, branch: str, data: DataFrame, files: List[Dict]):
         kb = self._create_or_get_kb(repo_name, branch)
-        print(f"Ingesting {len(data)} records into knowledge base '{kb.name}'...")
+        console.print(
+            f"🚀 [bold blue]Ingesting[/bold blue] [yellow]{len(data)} records[/yellow] into knowledge base '[cyan]{kb.name}[/cyan]'...",
+            style="blue",
+        )
         kb.insert(data)
-        print(
-            f"Successfully ingested {len(data)} records into knowledge base '{kb.name}'"
+        console.print(
+            f"✅ [bold green]Successfully ingested[/bold green] [yellow]{len(data)} records[/yellow] into knowledge base '[cyan]{kb.name}[/cyan]'",
+            style="green"
         )
 
         # Create repository record after successful ingestion
@@ -28,7 +35,6 @@ class MindsDBClient:
             repository = add_repository(
                 name=repo_name, branch=branch, files=files, knowledge_base_name=kb.name
             )
-            print(f"✅ Repository '{repo_name}' record created with {len(files)} files")
             return repository
         except Exception as e:
             print(f"⚠️  Warning: Failed to create repository record: {e}")
