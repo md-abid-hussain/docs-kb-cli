@@ -1,6 +1,6 @@
 # 📚 docs-kb
 
-AI-powered documentation knowledge base for GitHub repositories using MindsDB and local LLMs with MCP (Model Context Protocol) server support.
+CLI tool to create knowledge base on open source docs using **MindsDB Knowledge Base** and Ollama and serve to agent with MCP (Model Context Protocol) server.
 
 ## 🌟 Features
 
