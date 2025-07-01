@@ -282,7 +282,7 @@ chmod 755 ~/.docs-kb/
 
 ## 📋 Requirements
 
-- Python 3.9+
+- Python 3.13+
 - Ollama with nomic-embed-text and gemma2 models
 - MindsDB (local or cloud)
 - Optional: GitHub Personal Access Token

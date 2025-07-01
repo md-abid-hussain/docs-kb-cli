@@ -3,7 +3,7 @@ name = "docs-kb"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 dependencies = [
     "github-file-loader>=0.2.0",
     "mindsdb-sdk>=3.4.4",
