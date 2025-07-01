@@ -1,8 +1,10 @@
 import typer
+from dotenv import load_dotenv
 from rich.console import Console
 
-from .commands import ingest, list, manage, query
+from .commands import ingest, list, manage, query, start_mcp
 
+load_dotenv()
 console = Console()
 
 app = typer.Typer(
@@ -20,6 +22,7 @@ app.add_typer(ingest.app)
 app.add_typer(query.app)
 app.add_typer(manage.app)
 app.add_typer(list.app)
+app.add_typer(start_mcp.app)
 
 
 @app.callback()

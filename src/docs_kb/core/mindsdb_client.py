@@ -27,7 +27,7 @@ class MindsDBClient:
         kb.insert(data)
         console.print(
             f"✅ [bold green]Successfully ingested[/bold green] [yellow]{len(data)} records[/yellow] into knowledge base '[cyan]{kb.name}[/cyan]'",
-            style="green"
+            style="green",
         )
 
         # Create repository record after successful ingestion
@@ -41,12 +41,11 @@ class MindsDBClient:
             # Don't fail the ingestion if DB record creation fails
             return None
 
-    def query(self, kb_name: str, query: str):
+    def query(self, kb_name: str, query: str, limit: int = 10):
         kb = self.client.knowledge_bases.get(kb_name)
         if not kb:
             raise ValueError(f"Knowledge base '{kb_name}' does not exist.")
-
-        result = kb.find(query, limit=10).fetch()
+        result = kb.find(query, limit=limit).fetch()
         if result.empty:
             print(f"No results found for query: {query}")
             return None

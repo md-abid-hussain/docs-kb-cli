@@ -38,7 +38,7 @@ def ingest(
 
         console.print(
             f"🔍 Discovering files from repository: {repo_name} on branch: {branch}...",
-            style="blue"
+            style="blue",
         )
 
         file_loader = FileLoader(
@@ -48,21 +48,19 @@ def ingest(
         )
 
         # Discover files with status indicator
-        with console.status(
-            "[bold blue]🔍 Discovering files...", spinner="dots"
-        ):
+        with console.status("[bold blue]🔍 Discovering files...", spinner="dots"):
             discovered_files = file_loader.discover_files()
 
         if not discovered_files:
             console.print(
                 f"❌ No files found in repository {repo_name} on branch {branch}",
-                style="red"
+                style="red",
             )
             raise typer.Exit(code=1)
 
         console.print(
             f"📁 Discovered {len(discovered_files)} files in repository {repo_name} on branch {branch}.",
-            style="green"
+            style="green",
         )
 
         # Show file discovery summary
@@ -75,10 +73,10 @@ def ingest(
 
         # Start ingestion process
         console.print("\n📥 [bold blue]Starting Ingestion Process[/bold blue]")
-        
+
         with console.status(
-            f"[bold blue]📥 Loading {len(discovered_files)} files from repository...", 
-            spinner="dots"
+            f"[bold blue]📥 Loading {len(discovered_files)} files from repository...",
+            spinner="dots",
         ):
             files = file_loader.load_files()
 
@@ -116,8 +114,8 @@ def ingest(
 
         # Ingest into knowledge base
         with console.status(
-            f"[bold blue]🚀 Ingesting {len(files)} files into knowledge base...", 
-            spinner="dots"
+            f"[bold blue]🚀 Ingesting {len(files)} files into knowledge base...",
+            spinner="dots",
         ):
             mindsdb_client.ingest(
                 repo_name=repo_name, branch=branch, data=df, files=discovered_files
@@ -125,7 +123,7 @@ def ingest(
 
         console.print(
             f"✅ Successfully ingested {len(files)} files from repository {repo_name} on branch {branch}.",
-            style="green bold"
+            style="green bold",
         )
 
         # Display success summary

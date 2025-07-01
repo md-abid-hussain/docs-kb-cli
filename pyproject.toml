@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "fastmcp>=2.9.2",
     "github-file-loader>=0.2.0",
     "mindsdb-sdk>=3.4.4",
     "sqlmodel>=0.0.24",
